@@ -80,6 +80,51 @@ COMMANDS = {
             b"^D037000,010000,99,3,3,2300,2300,04,120U\x82\r",
         ],
     },
+    "DI": {
+        "name": "DI",
+        "prefix": "^P003",
+        "description": "",
+        "help": "",
+        "type": "QUERY",
+        "response": [],
+        "test_responses": []
+    },
+    "INGS": {
+        "name": "INGS",
+        "prefix": "^P004",
+        "description": "",
+        "help": "",
+        "type": "QUERY",
+        "response": [],
+        "test_responses": []
+    },
+    "RTCP": {
+        "name": "RTCP",
+        "prefix": "^P004",
+        "description": "",
+        "help": "",
+        "type": "QUERY",
+        "response": [],
+        "test_responses": []
+    },
+    "EMINFO": {
+        "name": "EMINFO",
+        "prefix": "^P005",
+        "description": "",
+        "help": "",
+        "type": "QUERY",
+        "response": [],
+        "test_responses": []
+    },
+    "AA,B,C,D,E,F,G,H,I": {
+        "name": "AA,B,C,D,E,F,G,H,I",
+        "prefix": "^D019",
+        "description": "",
+        "help": "",
+        "type": "QUERYD",
+        "response": [],
+        "test_responses": []
+    },
     "PIRI": {
         "name": "PIRI",
         "prefix": "^P005",
@@ -805,6 +850,19 @@ class pi17(AbstractProtocol):
         data_length = len(_cmd) + 1
         if _type == "QUERY":
             _prefix = f"^P{data_length:03}"
+            _pre_cmd = bytes(_prefix, "utf-8") + _cmd
+            log.debug(f"_pre_cmd: {_pre_cmd}")
+            log.debug(f"_prefix: {_prefix}")
+            # calculate the CRC
+            # crc_high; crc_low = crc(_pre_cmd)
+            # combine byte_cmd, CRC , return
+            # PI18 full command "^P005GS\x..\x..\r"
+            # _crc = bytes([crc_high, crc_low, 13])
+            full_command = _pre_cmd + bytes([13])  # + _crc
+            log.debug(f"full command: {full_command}")
+            return full_command
+        elif _type == "QUERYD":
+            _prefix = self._command_defn["prefix"]
             _pre_cmd = bytes(_prefix, "utf-8") + _cmd
             log.debug(f"_pre_cmd: {_pre_cmd}")
             log.debug(f"_prefix: {_prefix}")
